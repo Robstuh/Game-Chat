@@ -1,4 +1,4 @@
-package org.rschat.chatroom;
+package org.rschat.chat;
 
 import java.util.ArrayList;
 import java.util.List;

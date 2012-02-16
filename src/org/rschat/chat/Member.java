@@ -1,4 +1,4 @@
-package org.rschat.chatroom;
+package org.rschat.chat;
 
 public class Member {
 
