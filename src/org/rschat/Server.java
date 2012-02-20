@@ -1,29 +1,38 @@
 package org.rschat;
 
-import org.rschat.web.Database;
+import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 
-/**
- * @author Robbie
- * 
- */
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.channel.ChannelPipelineFactory;
+import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.rschat.net.ConnectionHandler;
+import org.rschat.net.codec.PacketDecoder;
+import org.rschat.net.codec.PacketEncoder;
+
 public class Server {
 
-	private static Database chatDatabase = new Database(null, null, null, null,
-			false, 30000);
+	private static ServerBootstrap bootstrap;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+	static {
+		bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
+				Executors.newCachedThreadPool(),
+				Executors.newCachedThreadPool()));
+		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+			@Override
+			public ChannelPipeline getPipeline() throws Exception {
+				return Channels.pipeline(new PacketEncoder(),
+						new PacketDecoder(), new ConnectionHandler());
+			}
+		});
 	}
 
-	/**
-	 * @return the chat database
-	 */
-	public static Database getChatDatabase() {
-		return chatDatabase;
+	public static void main(String[] args) {
+		bootstrap.bind(new InetSocketAddress(Constants.PORT));
+		System.out.println("Server listening on port " + Constants.PORT + ".");
+
 	}
 
 }
